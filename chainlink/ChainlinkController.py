@@ -2,11 +2,19 @@ import docker
 
 
 class ChainlinkController:
+
+    DOCKER_TAG = 'smartcontract/chainlink:0.9.4'
+
     def __init__(self):
-        print("init ChainlinkController")
         self.docker_client = docker.from_env()
-        self.docker_client.images.pull('smartcontract/chainlink:0.9.4')
+        self.docker_client.images.pull(self.DOCKER_TAG)
 
     def docker_run_chainlink(self, name):
-        print("docker run chainlink " + name)
-        self.docker_client.containers.run("smartcontract/chainlink", name=name, ports={6688: 6688})
+        self.docker_client.containers.run(self.DOCKER_TAG, name=name, ports={6688: 6688},
+                                          detach=True)
+
+    def docker_stop(self, name):
+        self.docker_client.containers.get(name).stop()
+
+    def docker_rm(self, name):
+        self.docker_client.containers.get(name).remove()
