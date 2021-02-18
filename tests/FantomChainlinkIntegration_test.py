@@ -5,6 +5,7 @@ import unittest
 from chainlink.ChainlinkController import ChainlinkController
 from fantom.FanomController import FantomController
 from solidity.SolidityController import SolidityController
+from definitions import ROOT_DIR
 
 
 class Test_FantomChainlinkIntegration(unittest.TestCase):
@@ -16,13 +17,13 @@ class Test_FantomChainlinkIntegration(unittest.TestCase):
         self.fantom_controller.docker_build()
         self.fantom_controller.docker_run_fantom("fantom_lachesis")
 
-        #self.chainlink_controller = ChainlinkController()
-        #self.chainlink_controller.docker_run_chainlink()
+        # self.chainlink_controller = ChainlinkController()
+        # self.chainlink_controller.docker_run_chainlink()
 
     def test_test(self):
         self.solidity_controller = SolidityController()
         self.solidity_controller.install_compiler("0.4.11")
-        self.solidity_controller.compile("../contracts")
+        self.solidity_controller.compile(ROOT_DIR + "/contracts")
 
     @classmethod
     def x_tearDownClass(self) -> None:
@@ -35,8 +36,6 @@ class Test_FantomChainlinkIntegration(unittest.TestCase):
         self.assertEqual("first", "first")
         print("wait for teardonw")
         time.sleep(10)
-
-
 
 
 if __name__ == '__main__':
