@@ -1,46 +1,80 @@
-import docker
-from definitions import ROOT_DIR
+import json
+import time
 from web3 import Web3
+from docker_helper.Dockerabstract import Dockerabstract
 
 
-class FantomController:
+class FantomController(Dockerabstract):
     DOCKER_TAG = "fantom_lachesis"
-    PORT = 3001
+    DOCKER_PORTS = {3001: 3001, 8546: 8546, 5050: 5050}
+    DOCKERFILE_DIR = "/Dockerfiles/Fantom/"
     URL = "http://localhost"
+    URL_TESTNET = "https://rpcapi.fantom.network"
 
-    def __init__(self):
-        self.docker_client = docker.from_env()
-        self.w3 = Web3(Web3.HTTPProvider(self.URL + ":" + str(self.PORT)))
+    def __init__(self, testnet=False):
+        if testnet:
+            self.w3 = Web3(Web3.HTTPProvider(self.URL_TESTNET))
+        else:
+            self.w3 = Web3(Web3.HTTPProvider(self.URL + ":" + str(3001)))
+        super().__init__()
 
-    def docker_build(self):
-        self.docker_client.images.build(path=(ROOT_DIR + "/Dockerfiles/Fantom/"), tag=self.DOCKER_TAG)
+    def sendFtm(self, _amount, _to):
+        acct = self.w3.eth.account.privateKeyToAccount(
+            "0x81ab836599c179fadf202e1ccdb61e386a3bd72f1d8fc200aa3e19422b57bf11")
 
-    def docker_stop(self, name):
-        self.docker_client.containers.get(name).stop()
+        tx_hash = self.w3.eth.sendTransaction(
+            {
+                'to': _to,
+                'from': acct.address,
+                'value': _amount,
+                'gas': 1728712,
+                'gasPrice': self.w3.toWei('21', 'gwei')
+            })
+        self.w3.eth.waitForTransactionReceipt(tx_hash)
 
-    def docker_rm(self, name):
-        self.docker_client.containers.get(name).remove()
-
-    def docker_rmi(self):
-        self.docker_client.images.remove(image=self.DOCKER_TAG)
-
-    def docker_run_fantom(self, name):
-        self.docker_client.containers.run(self.DOCKER_TAG, name=name, ports={self.PORT: 3001, 8535: 8535, 5050: 5050},
-                                          detach=True)
-
-    def deploy_contract(self, compiledContract, *args, **kwargs) -> None:
-        # Instantiate and deploy contract
-        contract = self.w3.eth.contract(
-            abi=compiledContract['abi'],
-            bytecode=compiledContract['bin']
+    def deploy_contract(self, abi, bytecode, *args, **kwargs) -> None:
+        contract_ = self.w3.eth.contract(
+            abi=abi,
+            bytecode=bytecode
         )
-        # Get transaction hash from deployed contract
-        tx_hash = contract.constructor(*args, **kwargs).transact({
-            "gas": 500000,
-            "gasLimit": 70000000,
-            "skipDryRun": True,
-            "from": self.w3.eth.accounts[0]
-        })
+        acct = self.w3.eth.account.privateKeyToAccount("0x81ab836599c179fadf202e1ccdb61e386a3bd72f1d8fc200aa3e19422b57bf11")
+        construct_txn = contract_.constructor(*args, **kwargs).buildTransaction({
+            'from': acct.address,
+            'nonce': self.w3.eth.getTransactionCount(acct.address),
+            'gas': 210000,
+            'gasPrice': self.w3.toWei('22', 'gwei')})
+        signed = acct.signTransaction(construct_txn)
+        tx_hash = self.w3.eth.sendRawTransaction(signed.rawTransaction)
         tx_receipt = self.w3.eth.waitForTransactionReceipt(tx_hash)
+        print(tx_receipt)
         return tx_receipt['contractAddress']
 
+    def send(self, abi, address, function_name, *args):
+        acct = self.w3.eth.account.privateKeyToAccount(
+            "0x81ab836599c179fadf202e1ccdb61e386a3bd72f1d8fc200aa3e19422b57bf11")
+        self.w3.eth.default_account = acct
+
+        contract = self.w3.eth.contract(
+            abi=abi,
+            address=address
+        )
+        function_txn = contract.functions[function_name](*args).buildTransaction({
+            'from': acct.address,
+            'nonce': self.w3.eth.getTransactionCount(acct.address),
+            'gas': 210000,
+            'gasPrice': self.w3.toWei('22', 'gwei')})
+
+        signed = acct.signTransaction(function_txn)
+        tx_hash = self.w3.eth.sendRawTransaction(signed.rawTransaction)
+        tx_receipt = self.w3.eth.waitForTransactionReceipt(tx_hash)
+        print(tx_receipt)
+
+    def call(self, abi, address, function_name, *args):
+        contract = self.w3.eth.contract(
+            abi=abi,
+            address=address
+        )
+        result = contract.functions[function_name](*args).call({})
+
+        print(result)
+        return result

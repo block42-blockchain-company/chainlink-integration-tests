@@ -1,9 +1,9 @@
 pragma solidity 0.4.24;
 
-import "./ChainlinkClient.sol";
-import "./vendor/Ownable.sol";
+import "https://github.com/smartcontractkit/chainlink/evm-contracts/src/v0.4/ChainlinkClient.sol";
+import "https://github.com/smartcontractkit/chainlink/evm-contracts/src/v0.4/vendor/Ownable.sol";
 
-contract APITestConsumer is ChainlinkClient, Ownable {
+contract ATestnetConsumer is ChainlinkClient, Ownable {
   uint256 constant private ORACLE_PAYMENT = 1 * LINK;
 
   uint256 public currentPrice;

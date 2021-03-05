@@ -1,3 +1,4 @@
-docker
-web3
+docker~=4.4.1
+web3~=5.16.0
 py-solc
+requests~=2.23.0

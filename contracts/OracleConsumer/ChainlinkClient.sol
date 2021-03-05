@@ -21,7 +21,7 @@ contract ChainlinkClient {
   uint256 constant private ARGS_VERSION = 1;
   bytes32 constant private ENS_TOKEN_SUBNAME = keccak256("link");
   bytes32 constant private ENS_ORACLE_SUBNAME = keccak256("oracle");
-  address constant private LINK_TOKEN_POINTER = 0xC89bD4E1632D3A43CB03AAAd5262cbe4038Bc571;
+  address constant private LINK_TOKEN_POINTER = 0x0a0f4b0D23F423E1e64100D0C2102f71E079B096;
 
   ENSInterface private ens;
   bytes32 private ensNode;
@@ -84,7 +84,6 @@ contract ChainlinkClient {
     emit ChainlinkRequested(requestId);
     require(link.transferAndCall(_oracle, _payment, encodeRequest(_req)), "unable to transferAndCall to oracle");
     requests += 1;
-
     return requestId;
   }
 
@@ -133,7 +132,7 @@ contract ChainlinkClient {
    * network as given by the Pointer contract
    */
   function setPublicChainlinkToken() internal {
-    setChainlinkToken(PointerInterface(LINK_TOKEN_POINTER).getAddress());
+    setChainlinkToken(address(LINK_TOKEN_POINTER));
   }
 
   /**
