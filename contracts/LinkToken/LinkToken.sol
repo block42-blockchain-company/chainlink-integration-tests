@@ -76,7 +76,7 @@ contract LinkToken is linkStandardToken, ERC677Token {
   // MODIFIERS
 
   modifier validRecipient(address _recipient) {
-    //require(_recipient != address(0) && _recipient != address(this));
+    require(_recipient != address(0) && _recipient != address(this));
     _;
   }
 

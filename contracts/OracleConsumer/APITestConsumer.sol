@@ -25,8 +25,8 @@ contract APITestConsumer is ChainlinkClient, Ownable {
     bytes32 indexed market
   );
 
-  constructor() public Ownable() {
-    setPublicChainlinkToken();
+  constructor(address _link) public Ownable() {
+    setChainlinkToken(_link);
   }
 
   function requestEthereumPrice(address _oracle, string _jobId)

@@ -6,7 +6,6 @@ from fantom.FanomController import FantomController
 from postgres.PostgresController import PostgresController
 from solidity.SolidityController import SolidityController
 from definitions import ROOT_DIR
-from test_docker.TestDocker import TestDocker
 
 log = Logger(name="Test_FantomChainlinkIntegration")
 
@@ -21,10 +20,6 @@ class Test_FantomChainlinkIntegration(unittest.TestCase):
         self.fantom_controller.create_network("integration-tests")
         self.fantom_controller.docker_build()
         self.fantom_controller.docker_run("fantom_lachesis")
-
-        self.test_docker = TestDocker()
-        self.test_docker.docker_build()
-        self.test_docker.docker_run("rest-test")
 
         self.postgres_controller = PostgresController()
         self.postgres_controller.docker_run("chainlink_postgres")
@@ -72,7 +67,7 @@ class Test_FantomChainlinkIntegration(unittest.TestCase):
         self.solidity_controller.compile(ROOT_DIR + "/contracts/OracleConsumer")
         api_address = self.solidity_controller.deploy(
             ROOT_DIR + "/contracts/OracleConsumer/APITestConsumer.sol:APITestConsumer",
-            self.fantom_controller, self.link_address, oracle_address)
+            self.fantom_controller, self.link_address)
         print("TEST API: " + api_address)
 
         self.fantom_controller.send(self.link_contract["abi"], self.link_address, "transfer", api_address, 100*(10**18))
@@ -95,10 +90,10 @@ class Test_FantomChainlinkIntegration(unittest.TestCase):
         print("jobid: " + chainlink_job_id)
         time.sleep(10)
         self.fantom_controller.send(api_contract["abi"], api_address, "requestEthereumPrice",
-                                    self.fantom_ctrl.w3.toChecksumAddress(oracle_address), chainlink_job_id)
+                                    oracle_address, chainlink_job_id)
 
         time.sleep(30)
-        result = self.fantom_ctrl.call(api_contract["abi"], api_address, "currentPrice")
+        result = self.fantom_controller.call(api_contract["abi"], api_address, "currentPrice")
         print(result)
 
 

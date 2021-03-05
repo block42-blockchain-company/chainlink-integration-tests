@@ -1,3 +1,5 @@
+import time
+
 from definitions import ROOT_DIR
 from fantom.FanomController import FantomController
 from solidity.SolidityController import SolidityController
@@ -46,7 +48,7 @@ def deploy_test_api():
     solidity_ctrl = SolidityController("v0.4.24")
     solidity_ctrl.compile(ROOT_DIR + "/contracts/OracleConsumer/")
     test_addr = solidity_ctrl.deploy(ROOT_DIR + "/contracts/OracleConsumer/APITestConsumer.sol:APITestConsumer",
-                                     fantom_ctrl)
+                                     fantom_ctrl, "0x6F43FF82CCA38001B6699a8AC47A2d0E66939407")
     #"0x0a0f4b0D23F423E1e64100D0C2102f71E079B096", "0x234256711dB1e916c51aEcf1DF6351bcf246a24d"
     print(test_addr)
 
@@ -81,7 +83,7 @@ def deploy_oracle_testnet():
 
     solidity_ctrl = SolidityController("0.4.24")
     solidity_ctrl.compile(ROOT_DIR + "/contracts/Oracle/")
-    contract_addr = solidity_ctrl.deploy(ROOT_DIR + "/contracts/Oracle/Oracle.sol:Oracle", fantom_ctrl, "0xd9d0C8Dcc8D1d2b3a87dfFC3711E8e5b608A15b4")
+    contract_addr = solidity_ctrl.deploy(ROOT_DIR + "/contracts/Oracle/Oracle.sol:Oracle", fantom_ctrl, "0x6F43FF82CCA38001B6699a8AC47A2d0E66939407")
     print(contract_addr)
 
 def balanceof():
@@ -130,8 +132,9 @@ if __name__ == '__main__':
     #fund()
     #deploy_oracle_testnet()
     #time.sleep(90)
+    call_deployt_api_test()
+    time.sleep(15)
     call_deployt_api_test_current_price()
-    #call_deployt_api_test()
     #deploy_oracle_testnet()
     #fund_test_api_contract()
     #balanceof()
