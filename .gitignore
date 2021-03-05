@@ -131,3 +131,7 @@ dmypy.json
 .idea/
 solc/
 .DS_Store
+
+secret
+tempkeys
+log.jsonl

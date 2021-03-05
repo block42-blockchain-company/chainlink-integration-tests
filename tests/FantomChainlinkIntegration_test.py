@@ -38,7 +38,7 @@ class Test_FantomChainlinkIntegration(unittest.TestCase):
         self.chainlink_controller.docker_run("chainlink_chainlink")
 
         log.debug("\t\twait for docker startup")
-        time.sleep(5)
+        time.sleep(10)
         log.debug("/Setup")
 
     @classmethod
@@ -80,9 +80,12 @@ class Test_FantomChainlinkIntegration(unittest.TestCase):
         self.fantom_controller.sendFtm((100*(10**18)), chainlink_address)
         chainlink_address = self.chainlink_controller.get_chainlink_address(1)
         self.fantom_controller.sendFtm((100 * (10 ** 18)), chainlink_address)
+        chainlink_address = self.chainlink_controller.get_chainlink_address(0)
+
         self.fantom_controller.sendFtm((100 * (10 ** 18)), oracle_address)
-        #self.fantom_controller.send(self.link_contract["abi"], self.link_address, "transfer", chainlink_address,
-        #                            100 * (10 ** 18))
+        self.fantom_controller.sendFtm((100000 * (10 ** 18)), api_address)
+        self.fantom_controller.send(self.link_contract["abi"], self.link_address, "transfer", chainlink_address,
+                                    100 * (10 ** 18))
         self.fantom_controller.send(oracle_contract["abi"], oracle_address, "setFulfillmentPermission", chainlink_address, True)
         time.sleep(3)
         chainlink_job_id = self.chainlink_controller.init_job(oracle_address)

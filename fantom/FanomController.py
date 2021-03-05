@@ -26,7 +26,7 @@ class FantomController(Dockerabstract):
                 'to': _to,
                 'from': acct.address,
                 'value': _amount,
-                'gas': 7000000,
+                'gas': 1728712,
                 'gasPrice': self.w3.toWei('21', 'gwei')
             })
         self.w3.eth.waitForTransactionReceipt(tx_hash)
@@ -41,7 +41,7 @@ class FantomController(Dockerabstract):
         construct_txn = contract_.constructor(*args, **kwargs).buildTransaction({
             'from': acct.address,
             'nonce': self.w3.eth.getTransactionCount(acct.address),
-            'gas': 1728712,
+            'gas': 7000000,
             'gasPrice': self.w3.toWei('21', 'gwei')})
         signed = acct.signTransaction(construct_txn)
         tx_hash = self.w3.eth.sendRawTransaction(signed.rawTransaction)
@@ -61,7 +61,7 @@ class FantomController(Dockerabstract):
         function_txn = contract.functions[function_name](*args).buildTransaction({
             'from': acct.address,
             'nonce': self.w3.eth.getTransactionCount(acct.address),
-            'gas': 210000,
+            'gas': 7000000,
             'gasPrice': self.w3.toWei('22', 'gwei')})
 
         signed = acct.signTransaction(function_txn)
