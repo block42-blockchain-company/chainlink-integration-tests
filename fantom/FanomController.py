@@ -10,8 +10,8 @@ class FantomController(Dockerabstract):
     URL = "http://localhost"
     URL_TESTNET = "https://rpcapi.fantom.network"
 
-    def __init__(self, testnet=False):
-        if testnet:
+    def __init__(self, mainnet=False):
+        if mainnet:
             self.w3 = Web3(Web3.HTTPProvider(self.URL_TESTNET))
         else:
             self.w3 = Web3(Web3.HTTPProvider(self.URL + ":" + str(3001)))
