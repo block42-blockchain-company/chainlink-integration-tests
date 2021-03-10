@@ -69,6 +69,7 @@ contract Oracle is ChainlinkRequestInterface, OracleInterface, Ownable {
     onlyLINK
     validRequestLength(_data)
     permittedFunctionsForLINK(_data)
+    returns (bool)
   {
     assembly { // solhint-disable-line no-inline-assembly
       mstore(add(_data, 36), _sender) // ensure correct sender is passed
@@ -76,6 +77,7 @@ contract Oracle is ChainlinkRequestInterface, OracleInterface, Ownable {
     }
     // solhint-disable-next-line avoid-low-level-calls
     require(address(this).delegatecall(_data), "Unable to create request"); // calls oracleRequest
+    return true;
   }
 
   /**

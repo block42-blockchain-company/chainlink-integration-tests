@@ -45,13 +45,17 @@ class Test_FantomChainlinkIntegration(unittest.TestCase):
     def tearDownClass(self) -> None:
         log.debug("Teardown")
         log.debug("\t\tstop fantom")
-        #self.fantom_controller.docker_stop("fantom_lachesis")
-        #self.fantom_controller.docker_rm("fantom_lachesis")
-        #self.fantom_controller.docker_rmi()
+        self.fantom_controller.docker_stop("fantom_lachesis")
+        self.fantom_controller.docker_rm("fantom_lachesis")
+        self.fantom_controller.docker_rmi()
 
         log.debug("\t\tstop chainlink")
-        #self.chainlink_controller.docker_stop("chainlink_chainlink")
-        #self.chainlink_controller.docker_rm("chainlink_chainlink")
+        self.chainlink_controller.docker_stop("chainlink_chainlink")
+        self.chainlink_controller.docker_rm("chainlink_chainlink")
+
+        log.debug("\t\tstop postgres")
+        self.chainlink_controller.docker_stop("chainlink_postgres")
+        self.chainlink_controller.docker_rm("chainlink_postgres")
         log.debug("/Teardown")
 
     def test_compile_contracts(self):
@@ -64,6 +68,7 @@ class Test_FantomChainlinkIntegration(unittest.TestCase):
         oracle_address = self.solidity_controller.deploy(ROOT_DIR + "/contracts/Oracle/Oracle.sol:Oracle",
                                                          self.fantom_controller, self.link_address)
         print("Oracle: " + oracle_address)
+
         self.solidity_controller.compile(ROOT_DIR + "/contracts/OracleConsumer")
         api_address = self.solidity_controller.deploy(
             ROOT_DIR + "/contracts/OracleConsumer/APITestConsumer.sol:APITestConsumer",
@@ -77,28 +82,28 @@ class Test_FantomChainlinkIntegration(unittest.TestCase):
 
         time.sleep(10)
         chainlink_address = self.chainlink_controller.get_chainlink_address(0)
-        self.fantom_controller.sendFtm((100*(10**18)), chainlink_address)
+        self.fantom_controller.sendFtm((100 * (10**18)), chainlink_address)
+
         chainlink_address = self.chainlink_controller.get_chainlink_address(1)
         self.fantom_controller.sendFtm((100 * (10 ** 18)), chainlink_address)
+
         chainlink_address = self.chainlink_controller.get_chainlink_address(0)
 
-        self.fantom_controller.sendFtm((100 * (10 ** 18)), oracle_address)
-        self.fantom_controller.sendFtm((100000 * (10 ** 18)), api_address)
         self.fantom_controller.send(self.link_contract["abi"], self.link_address, "transfer", chainlink_address,
                                     100 * (10 ** 18))
-        self.fantom_controller.send(oracle_contract["abi"], oracle_address, "setFulfillmentPermission", chainlink_address, True)
-        time.sleep(3)
-        chainlink_job_id = self.chainlink_controller.init_job(oracle_address)
+        self.fantom_controller.send(oracle_contract["abi"], oracle_address, "setFulfillmentPermission",
+                                    chainlink_address, True)
 
-        print("jobid: " + chainlink_job_id)
         time.sleep(10)
+        chainlink_job_id = self.chainlink_controller.init_job(oracle_address)
+        print("jobid: " + chainlink_job_id)
+        time.sleep(30)
         self.fantom_controller.send(api_contract["abi"], api_address, "requestEthereumPrice",
-                                    oracle_address, chainlink_job_id)
+                                    self.fantom_controller.w3.toChecksumAddress(oracle_address), chainlink_job_id)
 
         time.sleep(30)
         result = self.fantom_controller.call(api_contract["abi"], api_address, "currentPrice")
-        print(result)
-
+        self.assertTrue(int(result) > 0)
 
 
 if __name__ == '__main__':

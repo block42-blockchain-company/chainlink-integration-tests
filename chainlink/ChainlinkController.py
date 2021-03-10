@@ -9,7 +9,7 @@ class ChainlinkController(Dockerabstract):
     DOCKER_ENV = {
         "ETH_CHAIN_ID": 4003,
         "LINK_CONTRACT_ADDRESS": "{link_address}",
-        "ETH_URL": "wss://wsapi.fantom.network",
+        "ETH_URL": "ws://host.docker.internal:8546",
         "DATABASE_URL": "postgresql://postgres:postgres@chainlink_postgres:5432/chainlink?sslmode=disable",
         "DATABASE_TIMEOUT": 0,
         "SECURE_COOKIES": "false",

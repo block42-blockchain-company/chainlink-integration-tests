@@ -18,18 +18,23 @@ class FantomController(Dockerabstract):
         super().__init__()
 
     def sendFtm(self, _amount, _to):
+        print("send fantom to " + _to)
         acct = self.w3.eth.account.privateKeyToAccount(
             os.environ["PK"])
-
-        tx_hash = self.w3.eth.sendTransaction(
+        self.w3.eth.default_account = acct
+        signed = self.w3.eth.account.signTransaction(
             {
-                'to': _to,
-                'from': acct.address,
+                'to': self.w3.toChecksumAddress(_to),
+                'from': self.w3.toChecksumAddress(acct.address),
                 'value': _amount,
-                'gas': 1728712,
-                'gasPrice': self.w3.toWei('21', 'gwei')
-            })
-        self.w3.eth.waitForTransactionReceipt(tx_hash)
+                'nonce': self.w3.eth.getTransactionCount(acct.address),
+                'gas': 7000000,
+                'gasPrice': self.w3.toWei('22', 'gwei')
+            }, os.environ["PK"])
+        tx_hash = self.w3.eth.sendRawTransaction(signed.rawTransaction)
+        tx_rec = self.w3.eth.waitForTransactionReceipt(tx_hash)
+        print(tx_rec)
+        print("status: " + str(tx_rec["status"]))
 
     def deploy_contract(self, abi, bytecode, *args, **kwargs) -> None:
         contract_ = self.w3.eth.contract(
@@ -56,7 +61,7 @@ class FantomController(Dockerabstract):
 
         contract = self.w3.eth.contract(
             abi=abi,
-            address=address
+            address=self.w3.toChecksumAddress(address)
         )
         function_txn = contract.functions[function_name](*args).buildTransaction({
             'from': acct.address,
@@ -75,9 +80,11 @@ class FantomController(Dockerabstract):
         self.w3.eth.default_account = acct.address
         contract = self.w3.eth.contract(
             abi=abi,
-            address=address
+            address=self.w3.toChecksumAddress(address)
         )
-        result = contract.functions[function_name](*args).call({})
+        result = contract.functions[function_name](*args).call({
+            "from": acct.address
+        })
 
         print(result)
         return result
