@@ -38,7 +38,7 @@ class Test_FantomChainlinkIntegration(unittest.TestCase):
         self.chainlink_controller.docker_run("chainlink_chainlink")
 
         log.debug("\t\twait for docker startup")
-        time.sleep(10)
+        time.sleep(30)
         log.debug("/Setup")
 
     @classmethod
