@@ -1,0 +1,2 @@
+# Chainlink integration for fantom
+
