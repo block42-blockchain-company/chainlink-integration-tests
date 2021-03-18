@@ -12,7 +12,7 @@ Prerequests:
 
 
 ## 1. Deploy an Oracle
-You can use this solidity [smart contract](../contracts/Oracle/Oracle.sol) as your oracle and deploy it to the fantom network.
+You can use the [linked solidity smart contract](../contracts/Oracle/Oracle.sol) as your oracle and deploy it to the fantom network.
 
 Later you can send your requests to this deployed smart contract. 
 
