@@ -57,8 +57,8 @@ Example job (replace {oracle_address} below with the address of your deployed or
 ```
 
 ## 4. Oracle consumer
-In your smart contract, now you can send a request to the deployed oracle contract (see example below)
-The example contract implements ChainlinkClient and Ownable. You can find the whole example [here](../contracts/OracleConsumer/APITestConsumer.sol)
+In your smart contract, now you can send a request to the deployed oracle contract (see example below).
+The example contract implements ChainlinkClient and Ownable. You can find the whole example [here](../contracts/OracleConsumer/APITestConsumer.sol).
 The oracle address has to be specified in the constructor when deploying the contract.
 
 ```solidity
