@@ -1,2 +1,2 @@
 # chainlink-integration-tests
-Chainlink integration tests for fantom
+Chainlink integration tests for evm compatible blockchains
