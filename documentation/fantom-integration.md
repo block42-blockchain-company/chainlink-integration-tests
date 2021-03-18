@@ -23,7 +23,7 @@ Therefore call the oracle contract function `setFulfillmentPermission(chainlink_
 
 You can find the chainlink_address in the chainlink node GUI at the config page. 
 
-## 3. Add jobs to the node
+## 3. Add jobs to the chainlink node
 In the chainlink node GUI you can setup different jobs easely. Every job has at least one initiator and one task.
 
  - From the admin dashboard, click on New Job.
@@ -77,8 +77,8 @@ function requestEthereumPrice(address _oracle, string _jobId)
 
 ## 5. Create a request to your node
 To fulfill a chainlink request you have to fund your oracle consumer address with some LINK tokens. 
-When you call the `requestEthereumPrice(address _oracle, string _jobId)` function you have to specify the oracle address and the jobId from above.
+When you call the `requestEthereumPrice(address _oracle, string _jobId)` function you have to specify the oracle address and the JobID from above.
 Then the the oracle will be called from the smart contract and send one LINK to the oracle address.
-The oracle contract submites an event with the jobId. Because our chainlink node is listening to the oracle events and the jobId the chainlink request will be fullfilled.
+The oracle contract submites an event with the JobID. Because our chainlink node is listening to the oracle events and the JobID the chainlink request will be fullfilled.
 
 When calling the `currentPrice` function, after the chainlink request was fulfilled the current Ethereum price will be returned.
