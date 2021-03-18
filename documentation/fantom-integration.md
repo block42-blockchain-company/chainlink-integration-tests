@@ -77,8 +77,11 @@ function requestEthereumPrice(address _oracle, string _jobId)
 
 ## 5. Create a request to your node
 To fulfill a chainlink request you have to fund your oracle consumer address with some LINK tokens. 
+
 When you call the `requestEthereumPrice(address _oracle, string _jobId)` function you have to specify the oracle address and the JobID from above.
 Then the the oracle will be called from the smart contract and send one LINK to the oracle address.
+
 The oracle contract submites an event with the JobID. Because our chainlink node is listening to the oracle events and the JobID the chainlink request will be fullfilled.
 
+## 6. Read the chainlink response
 When calling the `currentPrice` function, after the chainlink request was fulfilled the current Ethereum price will be returned.
