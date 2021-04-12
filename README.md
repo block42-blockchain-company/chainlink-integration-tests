@@ -9,7 +9,7 @@ Chainlink integration tests for evm compatible blockchains
 pip install -r requirements.txt
 ```
 
-install pytest
+install pytest if not yet installed
 ```
 pip install pytest
 ```
