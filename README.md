@@ -1,4 +1,4 @@
-# chainlink-integration-tests
+# Chainlink integration tests
 Chainlink integration tests for evm compatible blockchains
 
 ## Run the integration tests
