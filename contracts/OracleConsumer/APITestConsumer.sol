@@ -34,9 +34,9 @@ contract APITestConsumer is ChainlinkClient, Ownable {
     onlyOwner
   {
     Chainlink.Request memory req = buildChainlinkRequest(stringToBytes32(_jobId), this, this.fulfillEthereumPrice.selector);
-    req.add("get", "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD");
-    req.add("path", "USD");
-    req.addInt("times", 100);
+    // req.add("get", "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD");
+    // req.add("path", "USD");
+    // req.addInt("times", 100);
     sendChainlinkRequestTo(_oracle, req, ORACLE_PAYMENT);
   }
 

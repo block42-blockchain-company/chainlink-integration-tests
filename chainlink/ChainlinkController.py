@@ -16,7 +16,7 @@ class ChainlinkController(Dockerabstract):
         "ROOT": "/chainlink",
         "MIN_OUTGOING_CONFIRMATIONS": 2,
         "CHAINLINK_TLS_PORT": 0,
-        "GAS_UPDATER_ENABLED": "true",
+        "GAS_UPDATER_ENABLED": "false",
         "ALLOW_ORIGINS": "*",
         "FEATURE_EXTERNAL_INITIATORS": "true",
         "LOG_LEVEL": "debug",
@@ -26,8 +26,10 @@ class ChainlinkController(Dockerabstract):
     DOCKER_COMMAND = "local n -p /chainlink/.password -a /chainlink/.api"
     DOCKER_VOLUMES = [ROOT_DIR + "/Dockerfiles/chainlink/config:/chainlink"]
 
-    def __init__(self, link_address):
+    def __init__(self, link_address, eth_url="ws://fantom_lachesis:8546", chain_id=4003):
         self.DOCKER_ENV["LINK_CONTRACT_ADDRESS"] = link_address
+        self.DOCKER_ENV["ETH_URL"] = eth_url
+        self.DOCKER_ENV["ETH_CHAIN_ID"] = chain_id
         super().__init__()
 
     def init_job(self, oracle_address):
@@ -37,23 +39,27 @@ class ChainlinkController(Dockerabstract):
         data = {
             "initiators": [
                 {
-                    "type": "runlog",
+                    "type": "ethlog",
                     "params": {
                         "address": f"{oracle_address}"
                     }
                 }
             ], "tasks": [
                 {
-                  "type": "httpget"
+                    "type": "httpget",
+                    #"confirmations": 0,
+                    #"params": {"get": "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD"}
                 },
                 {
-                  "type": "jsonparse"
+                    "type": "jsonparse",
+                    #"params": {"path": ["USD"]}
                 },
                 {
-                  "type": "ethbytes32"
+                    "type": "ethbytes32",
+                    #"params": {"times": 100}
                 },
                 {
-                  "type": "ethtx"
+                    "type": "ethtx"
                 }
             ]
         }
