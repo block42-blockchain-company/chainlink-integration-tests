@@ -205,21 +205,21 @@ def init_chainlink_job():
 
 
 if __name__ == '__main__':
-    # deploy_link_oracle_api()
-    # start_chainlinkpostgres()                       # 1.
-    # init_chainlink_job()                          # 2.
+    # deploy_link_oracle_api()                      # 1.
+    # start_chainlinkpostgres()
+    # init_chainlink_job()                          # 2. (start the chainlink node with the right LINK token before)
     # start_fantom_and_chainlinkpostgres()
     # time.sleep(3)
     # test_chainlink_integration()
-    deploy_test_api()
+    # deploy_test_api()
     # fund()
     # deploy_oracle_testnet()
     # time.sleep(90)
     # withdraw_link()
-    # fund_chainlink_node()                           # 3.
-    # fund_test_api_contract()                        # 3.
-    # set_fullfilment_permission()                    # 4.
-    call_deployt_api_test()                       # 5. (set chainlink job id before)
+    # fund_chainlink_node()                           # 3. (after chainlink is up and running)
+    fund_test_api_contract()                        # 3.
+    # set_fullfilment_permission()                    # 3.
+    # call_deployt_api_test()                         # 4. (set chainlink job id before)
     # time.sleep(15)
     # call_deployt_api_test_current_price()
     # deploy_oracle_testnet()

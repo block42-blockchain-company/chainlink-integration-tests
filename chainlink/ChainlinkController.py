@@ -39,7 +39,7 @@ class ChainlinkController(Dockerabstract):
         data = {
             "initiators": [
                 {
-                    "type": "ethlog",
+                    "type": "runlog",
                     "params": {
                         "address": f"{oracle_address}"
                     }
@@ -47,16 +47,12 @@ class ChainlinkController(Dockerabstract):
             ], "tasks": [
                 {
                     "type": "httpget",
-                    #"confirmations": 0,
-                    #"params": {"get": "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD"}
                 },
                 {
                     "type": "jsonparse",
-                    #"params": {"path": ["USD"]}
                 },
                 {
                     "type": "ethbytes32",
-                    #"params": {"times": 100}
                 },
                 {
                     "type": "ethtx"
