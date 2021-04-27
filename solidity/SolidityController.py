@@ -70,9 +70,9 @@ class SolidityController:
         # self.compiled_contracts = solc.compile_files(source_files=paths, solc_binary="./solc/solc")
         print(self.compiled_contracts.keys())
 
-    def deploy(self, contract_name, chain_controller, *args, **kwargs):
+    def deploy(self, private_key, contract_name, chain_controller, *args, **kwargs):
         contract = self.compiled_contracts.get(contract_name)
-        return chain_controller.deploy_contract(contract["abi"], "0x" + contract["bin"], *args, **kwargs)
+        return chain_controller.deploy_contract(private_key, contract["abi"], "0x" + contract["bin"], *args, **kwargs)
 
     def getContract(self, contract_name):
         return self.compiled_contracts.get(contract_name)

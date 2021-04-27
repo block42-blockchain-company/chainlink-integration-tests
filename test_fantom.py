@@ -1,12 +1,11 @@
 import time
-
+import os
 from blockchain.OKExController import OKExController
 from chainlink.ChainlinkController import ChainlinkController
 from definitions import ROOT_DIR
 from blockchain.FanomController import FantomController
 from postgres.PostgresController import PostgresController
 from solidity.SolidityController import SolidityController
-from test_docker.TestDocker import TestDocker
 
 LINK_ADDR_mainnet = "0xb3654dc3D10Ea7645f8319668E8F54d2574FBdC8"
 LINK_ADDR = "0x86989606A88841E2Fb56787806a5f7a3A89641e2"
@@ -32,23 +31,23 @@ def test_chainlink_integration():
 
     solidity_ctrl = SolidityController("v0.4.24")
     solidity_ctrl.compile(ROOT_DIR + "/contracts/Oracle/")
-    oracle_addr = solidity_ctrl.deploy(ROOT_DIR + "/contracts/Oracle/Oracle.sol:Oracle", fantom_ctrl,
+    oracle_addr = solidity_ctrl.deploy(os.environ["PK_FTM"], ROOT_DIR + "/contracts/Oracle/Oracle.sol:Oracle", fantom_ctrl,
                                        fantom_ctrl.w3.toChecksumAddress(LINK_ADDR))
     print("Oracle: " + oracle_addr)  # 0x2ab0D4e6b968844B55a20200e8Fc3Dd6dAa29998
     solidity_ctrl = SolidityController("v0.4.24")
     solidity_ctrl.compile(ROOT_DIR + "/contracts/OracleConsumer/")
-    test_addr = solidity_ctrl.deploy(ROOT_DIR + "/contracts/OracleConsumer/APITestConsumer.sol:APITestConsumer",
+    test_addr = solidity_ctrl.deploy(os.environ["PK_FTM"], ROOT_DIR + "/contracts/OracleConsumer/APITestConsumer.sol:APITestConsumer",
                                      fantom_ctrl, fantom_ctrl.w3.toChecksumAddress(LINK_ADDR))
     print("Test: " + test_addr)  # 0xd897A7BEDa1b5f3c1CC54F518202Ce902C8a12e0
     solidity_ctrl = SolidityController("v0.8.1")
     solidity_ctrl.compile(ROOT_DIR + "/contracts/WrappedLinkToken")
     link_contract = solidity_ctrl.getContract(
         ROOT_DIR + "/contracts/WrappedLinkToken/LinkToken.sol:ChainLink")
-    fantom_ctrl.call(link_contract["abi"], fantom_ctrl.w3.toChecksumAddress(LINK_ADDR), "balanceOf", OWNER_ADDR)
-    fantom_ctrl.send(link_contract["abi"], fantom_ctrl.w3.toChecksumAddress(LINK_ADDR), "transfer",
+    fantom_ctrl.call(os.environ["PK_FTM"], link_contract["abi"], fantom_ctrl.w3.toChecksumAddress(LINK_ADDR), "balanceOf", OWNER_ADDR)
+    fantom_ctrl.send(os.environ["PK_FTM"], link_contract["abi"], fantom_ctrl.w3.toChecksumAddress(LINK_ADDR), "transfer",
                      test_addr, 1 * (10 ** 18))
-    fantom_ctrl.call(link_contract["abi"], fantom_ctrl.w3.toChecksumAddress(LINK_ADDR), "balanceOf", test_addr)
-    fantom_ctrl.call(link_contract["abi"], fantom_ctrl.w3.toChecksumAddress(LINK_ADDR), "balanceOf", OWNER_ADDR)
+    fantom_ctrl.call(os.environ["PK_FTM"], link_contract["abi"], fantom_ctrl.w3.toChecksumAddress(LINK_ADDR), "balanceOf", test_addr)
+    fantom_ctrl.call(os.environ["PK_FTM"], link_contract["abi"], fantom_ctrl.w3.toChecksumAddress(LINK_ADDR), "balanceOf", OWNER_ADDR)
 
     # solidity_ctrl = SolidityController("v0.4.24")
     # solidity_ctrl.compile(ROOT_DIR + "/contracts/OracleConsumer/")
@@ -63,17 +62,20 @@ def deploy_link_oracle_api():
     fantom_controller = FantomController(MAINNET)
     solidity_ctrl = SolidityController("v0.4.25")
     solidity_ctrl.compile(ROOT_DIR + "/contracts/LinkToken")
-    link_addr = solidity_ctrl.deploy(ROOT_DIR + "/contracts/LinkToken/LinkToken.sol:LinkToken", fantom_controller)
+    link_addr = solidity_ctrl.deploy(os.environ["PK_FTM"],
+                                     ROOT_DIR + "/contracts/LinkToken/LinkToken.sol:LinkToken", fantom_controller)
     print("link: " + link_addr)
 
     solidity_ctrl = SolidityController("v0.4.24")
     solidity_ctrl.compile(ROOT_DIR + "/contracts/Oracle/")
-    oracle_addr = solidity_ctrl.deploy(ROOT_DIR + "/contracts/Oracle/Oracle.sol:Oracle", fantom_controller, link_addr)
+    oracle_addr = solidity_ctrl.deploy(os.environ["PK_FTM"],
+                                       ROOT_DIR + "/contracts/Oracle/Oracle.sol:Oracle", fantom_controller, link_addr)
 
     print("oracle: " + oracle_addr)
 
     solidity_ctrl.compile(ROOT_DIR + "/contracts/OracleConsumer/")
-    test_addr = solidity_ctrl.deploy(ROOT_DIR + "/contracts/OracleConsumer/APITestConsumer.sol:APITestConsumer",
+    test_addr = solidity_ctrl.deploy(os.environ["PK_FTM"],
+                                     ROOT_DIR + "/contracts/OracleConsumer/APITestConsumer.sol:APITestConsumer",
                                      fantom_controller, link_addr)
 
     print("test: " + test_addr)
@@ -83,7 +85,8 @@ def deploy_test_api():
     okex_controller = OKExController(False)
     solidity_ctrl = SolidityController("v0.4.24")
     solidity_ctrl.compile(ROOT_DIR + "/contracts/OracleConsumer/")
-    test_addr = solidity_ctrl.deploy(ROOT_DIR + "/contracts/OracleConsumer/APITestConsumer.sol:APITestConsumer",
+    test_addr = solidity_ctrl.deploy(os.environ["PK_FTM"],
+                                     ROOT_DIR + "/contracts/OracleConsumer/APITestConsumer.sol:APITestConsumer",
                                      okex_controller, LINK_ADDR)
     # "0x0a0f4b0D23F423E1e64100D0C2102f71E079B096", "0x234256711dB1e916c51aEcf1DF6351bcf246a24d"
     print(test_addr)
@@ -95,9 +98,10 @@ def call_deployt_api_test():
     solidity_ctrl.compile(ROOT_DIR + "/contracts/OracleConsumer/")
     api_test_consumer = solidity_ctrl.getContract(
         ROOT_DIR + "/contracts/OracleConsumer/APITestConsumer.sol:APITestConsumer")
-    ftm_controller.send(api_test_consumer["abi"], ftm_controller.w3.toChecksumAddress(ORACLE_TEST_ADDR),
-                         "requestEthereumPrice", 152625,
-                         ftm_controller.w3.toChecksumAddress(ORACLE_ADDR), CHAINLINK_JOBID)
+    ftm_controller.send(os.environ["PK_FTM"],
+                        api_test_consumer["abi"], ftm_controller.w3.toChecksumAddress(ORACLE_TEST_ADDR),
+                        "requestEthereumPrice", 152625,
+                        ftm_controller.w3.toChecksumAddress(ORACLE_ADDR), CHAINLINK_JOBID)
     # fantom_ctrl.call(api_test_consumer["abi"], "0xd9d0C8Dcc8D1d2b3a87dfFC3711E8e5b608A15b4", "getMyTest")
 
 
@@ -107,26 +111,28 @@ def call_deployt_api_test_current_price():
     solidity_ctrl.compile(ROOT_DIR + "/contracts/OracleConsumer/")
     api_test_consumer = solidity_ctrl.getContract(
         ROOT_DIR + "/contracts/OracleConsumer/APITestConsumer.sol:APITestConsumer")
-    okexchain_controller.call(api_test_consumer["abi"], ORACLE_TEST_ADDR, "currentPrice")
+    okexchain_controller.call(os.environ["PK_FTM"], api_test_consumer["abi"], ORACLE_TEST_ADDR, "currentPrice")
 
 
 def fund_chainlink_node():
     ftm_controller = FantomController(MAINNET)
-    ftm_controller.sendToken(10, CHAINLINK_NODE_ADDR)
+    ftm_controller.sendToken(os.environ["PK_FTM"], 10, CHAINLINK_NODE_ADDR)
 
 def fund_test_api_contract():
     ftm_controller = FantomController(MAINNET)
     solidity_ctrl = SolidityController("v0.4.25")
     solidity_ctrl.compile(ROOT_DIR + "/contracts/LinkToken")
     link_contract = solidity_ctrl.getContract(ROOT_DIR + "/contracts/LinkToken/LinkToken.sol:LinkToken")
-    ftm_controller.send(link_contract["abi"], LINK_ADDR, "transfer", 152625, ORACLE_TEST_ADDR, 10 * (10 ** 18))
+    ftm_controller.send(os.environ["PK_FTM"],
+                        link_contract["abi"], LINK_ADDR, "transfer", 152625, ORACLE_TEST_ADDR, 10 * (10 ** 18))
 
 def deploy_oracle_testnet():
     fantom_ctrl = FantomController(MAINNET)
 
     solidity_ctrl = SolidityController("0.4.24")
     solidity_ctrl.compile(ROOT_DIR + "/contracts/Oracle/")
-    contract_addr = solidity_ctrl.deploy(ROOT_DIR + "/contracts/Oracle/Oracle.sol:Oracle", fantom_ctrl,
+    contract_addr = solidity_ctrl.deploy(os.environ["PK_FTM"],
+                                         ROOT_DIR + "/contracts/Oracle/Oracle.sol:Oracle", fantom_ctrl,
                                          fantom_ctrl.w3.toChecksumAddress(LINK_ADDR))
     print(contract_addr)
 
@@ -138,10 +144,12 @@ def balanceof():
     solidity_ctrl.compile(ROOT_DIR + "/contracts/LinkToken")
     link_contract = solidity_ctrl.getContract(
         ROOT_DIR + "/contracts/LinkToken/LinkToken.sol:LinkToken")
-    okex_controller.call(link_contract["abi"], okex_controller.w3.toChecksumAddress(LINK_ADDR), "balanceOf",
-                     okex_controller.w3.toChecksumAddress(ORACLE_TEST_ADDR))
-    okex_controller.call(link_contract["abi"], okex_controller.w3.toChecksumAddress(LINK_ADDR), "balanceOf",
-                     okex_controller.w3.toChecksumAddress(ORACLE_ADDR))
+    okex_controller.call(os.environ["PK_FTM"],
+                         link_contract["abi"], okex_controller.w3.toChecksumAddress(LINK_ADDR), "balanceOf",
+                         okex_controller.w3.toChecksumAddress(ORACLE_TEST_ADDR))
+    okex_controller.call(os.environ["PK_FTM"],
+                         link_contract["abi"], okex_controller.w3.toChecksumAddress(LINK_ADDR), "balanceOf",
+                         okex_controller.w3.toChecksumAddress(ORACLE_ADDR))
 
 
 def start_fantom_and_chainlinkpostgres():
@@ -165,7 +173,7 @@ def fund():
     # oracle: 0xCB32b0540739d965FdcfC7d5A56C14ecD467D4b2
     # test: 0x7a742c7dF88926b17677fC98D60fBa1967532114
     fantom_controller = OKExController()
-    fantom_controller.sendToken((2 * (10 ** 18)), ORACLE_TEST_ADDR)
+    fantom_controller.sendToken(os.environ["PK_FTM"], (2 * (10 ** 18)), ORACLE_TEST_ADDR)
 
 
 def set_fullfilment_permission():
@@ -173,10 +181,10 @@ def set_fullfilment_permission():
     solidity_ctrl = SolidityController("0.4.24")
     solidity_ctrl.compile(ROOT_DIR + "/contracts/Oracle/")
     oracle_contract = solidity_ctrl.getContract(ROOT_DIR + "/contracts/Oracle/Oracle.sol:Oracle")
-    ftm_controller.send(oracle_contract["abi"], ftm_controller.w3.toChecksumAddress(ORACLE_ADDR),
-                         "setFulfillmentPermission", 700000,
-                         ftm_controller.w3.toChecksumAddress(CHAINLINK_NODE_ADDR),
-                         True)
+    ftm_controller.send(os.environ["PK_FTM"], oracle_contract["abi"], ftm_controller.w3.toChecksumAddress(ORACLE_ADDR),
+                        "setFulfillmentPermission", 700000,
+                        ftm_controller.w3.toChecksumAddress(CHAINLINK_NODE_ADDR),
+                        True)
 
 
 def withdraw_link():
@@ -185,7 +193,7 @@ def withdraw_link():
     solidity_ctrl.compile(ROOT_DIR + "/contracts/OracleConsumer/")
     api_test_consumer = solidity_ctrl.getContract(
         ROOT_DIR + "/contracts/OracleConsumer/APITestConsumer.sol:APITestConsumer")
-    fantom_controller.send(api_test_consumer["abi"], ORACLE_TEST_ADDR, "withdrawLink")
+    fantom_controller.send(os.environ["PK_FTM"], api_test_consumer["abi"], ORACLE_TEST_ADDR, "withdrawLink")
 
 
 def start_chainlinkpostgres():
