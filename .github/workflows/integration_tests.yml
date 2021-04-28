@@ -19,4 +19,5 @@ jobs:
         run: pytest tests
         env:
           PYTHONPATH: "."
-          PK: ${{ secrets.PRIVATEKEY_FTM_FAKENET }}
+          PK_FTM: ${{ secrets.PRIVATEKEY_FTM_FAKENET }}
+          PK_OKEx: ${{ secrets.PRIVATEKEY_OKEx_TESTNET }}
