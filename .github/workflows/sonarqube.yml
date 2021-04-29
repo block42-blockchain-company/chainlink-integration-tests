@@ -8,7 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: SonarQube Scan
-      uses: kitabisa/sonarqube-action@master
+      uses: block42-blockchain-company/sonarqube-action@master
       with:
         host: ${{ secrets.SONARQUBE_ADDRESS }}
         login: ${{ secrets.SONARQUBE_TOKEN }}
