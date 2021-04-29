@@ -10,7 +10,7 @@ jobs:
     - name: SonarQube Scan
       uses: block42-blockchain-company/sonarqube-action@master
       with:
-        host: ${{ secrets.SONARQUBE_ADDRESS }}
+        fqdn: ${{ secrets.SONARQUBE_ADDRESS }}
         login: ${{ secrets.SONARQUBE_TOKEN }}
-        dns: sonarqube.b42.tech
+        host: sonarqube.b42.tech
         port: 443
