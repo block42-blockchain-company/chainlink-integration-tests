@@ -12,3 +12,5 @@ jobs:
       with:
         host: ${{ secrets.SONARQUBE_ADDRESS }}
         login: ${{ secrets.SONARQUBE_TOKEN }}
+        dns: sonarqube.b42.tech
+        port: 443
